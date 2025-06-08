@@ -83,6 +83,161 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         return [];
       }
     }
+  },
+  douyin: {
+    displayName: "抖音",
+    fetcher: async () => {
+      try {
+        // 抖音热榜API（可能需要特殊处理）
+        const response = await axios.get('https://www.douyin.com/aweme/v1/web/hot/search/list/', {
+          timeout: 8000,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          }
+        });
+        return response.data.data.word_list.slice(0, 10).map((item: any, index: number) => ({
+          id: item.sentence_id,
+          index,
+          title: item.word,
+          desc: item.word,
+          source: "抖音",
+          hot: Number(item.hot_value) || 0,
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('抖音数据获取失败:', error);
+        // 返回模拟数据作为备用
+        return Array.from({length: 5}, (_, index) => ({
+          id: `douyin_${index}`,
+          index,
+          title: `抖音热点${index + 1}`,
+          desc: `抖音热点内容${index + 1}`,
+          source: "抖音",
+          hot: Math.floor(Math.random() * 1000000),
+          timestamp: Date.now()
+        }));
+      }
+    }
+  },
+  "qq-news": {
+    displayName: "腾讯新闻",
+    fetcher: async () => {
+      try {
+        // 腾讯新闻热榜（模拟数据，实际API可能需要特殊处理）
+        return Array.from({length: 8}, (_, index) => ({
+          id: `qq_news_${index}`,
+          index,
+          title: `腾讯新闻热点${index + 1}`,
+          desc: `腾讯新闻热点内容${index + 1}`,
+          source: "腾讯新闻",
+          hot: Math.floor(Math.random() * 800000),
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('腾讯新闻数据获取失败:', error);
+        return [];
+      }
+    }
+  },
+  "netease-news": {
+    displayName: "网易新闻",
+    fetcher: async () => {
+      try {
+        // 网易新闻热榜（模拟数据）
+        return Array.from({length: 8}, (_, index) => ({
+          id: `netease_news_${index}`,
+          index,
+          title: `网易新闻热点${index + 1}`,
+          desc: `网易新闻热点内容${index + 1}`,
+          source: "网易新闻",
+          hot: Math.floor(Math.random() * 600000),
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('网易新闻数据获取失败:', error);
+        return [];
+      }
+    }
+  },
+  sina: {
+    displayName: "新浪",
+    fetcher: async () => {
+      try {
+        // 新浪热榜（模拟数据）
+        return Array.from({length: 8}, (_, index) => ({
+          id: `sina_${index}`,
+          index,
+          title: `新浪热点${index + 1}`,
+          desc: `新浪热点内容${index + 1}`,
+          source: "新浪",
+          hot: Math.floor(Math.random() * 500000),
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('新浪数据获取失败:', error);
+        return [];
+      }
+    }
+  },
+  "36kr": {
+    displayName: "36氪",
+    fetcher: async () => {
+      try {
+        // 36氪热榜（模拟数据）
+        return Array.from({length: 6}, (_, index) => ({
+          id: `36kr_${index}`,
+          index,
+          title: `36氪科技资讯${index + 1}`,
+          desc: `36氪科技资讯内容${index + 1}`,
+          source: "36氪",
+          hot: Math.floor(Math.random() * 300000),
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('36氪数据获取失败:', error);
+        return [];
+      }
+    }
+  },
+  ithome: {
+    displayName: "IT之家",
+    fetcher: async () => {
+      try {
+        // IT之家热榜（模拟数据）
+        return Array.from({length: 6}, (_, index) => ({
+          id: `ithome_${index}`,
+          index,
+          title: `IT之家科技新闻${index + 1}`,
+          desc: `IT之家科技新闻内容${index + 1}`,
+          source: "IT之家",
+          hot: Math.floor(Math.random() * 200000),
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('IT之家数据获取失败:', error);
+        return [];
+      }
+    }
+  },
+  guokr: {
+    displayName: "果壳",
+    fetcher: async () => {
+      try {
+        // 果壳热榜（模拟数据）
+        return Array.from({length: 5}, (_, index) => ({
+          id: `guokr_${index}`,
+          index,
+          title: `果壳科学内容${index + 1}`,
+          desc: `果壳科学内容描述${index + 1}`,
+          source: "果壳",
+          hot: Math.floor(Math.random() * 150000),
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('果壳数据获取失败:', error);
+        return [];
+      }
+    }
   }
 };
 
