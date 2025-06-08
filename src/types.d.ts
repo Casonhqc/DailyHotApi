@@ -17,11 +17,22 @@ export interface ListItem {
   mobileUrl: string;
 }
 
+// 聚合榜单数据 (符合用户要求的格式)
+export interface AggregatedItem {
+  id: string;
+  index: number;
+  title: string;
+  desc: string;
+  source: string;
+  hot: number;
+  timestamp: number;
+}
+
 // 路由接口数据
 export interface RouterResType {
   updateTime: string | number;
   fromCache: boolean;
-  data: ListItem[];
+  data: ListItem[] | AggregatedItem[];
   message?: string;
 }
 

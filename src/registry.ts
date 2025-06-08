@@ -58,6 +58,55 @@ for (let index = 0; index < allRoutePath.length; index++) {
   if (excludeRoutes.includes(router)) {
     continue;
   }
+
+  // Special handling for aggregate route
+  if (router === "aggregate") {
+    const aggregateApp = app.basePath(`/${router}`);
+
+    // Handle base aggregate route: /aggregate/ (must come before parameterized route)
+    aggregateApp.get("/", async (c) => {
+      // 是否采用缓存
+      const noCache = c.req.query("cache") === "false";
+      // 获取路由路径
+      const { handleRoute } = await import(`./routes/${router}.js`);
+      const listData = await handleRoute(c, noCache);
+      return c.json({ code: 200, ...listData });
+    });
+
+    // Handle aggregate route with sources parameter: /aggregate/{sources}
+    aggregateApp.get("/:sources", async (c) => {
+      // 是否采用缓存
+      const noCache = c.req.query("cache") === "false";
+      // 限制显示条目
+      const limit = c.req.query("limit");
+      // 是否输出 RSS
+      const rssEnabled = c.req.query("rss") === "true";
+      // 获取路由路径
+      const { handleRoute } = await import(`./routes/${router}.js`);
+      const listData = await handleRoute(c, noCache);
+      // 是否限制条目
+      if (limit && listData?.data?.length > parseInt(limit)) {
+        listData.total = parseInt(limit);
+        listData.data = listData.data.slice(0, parseInt(limit));
+      }
+      // 是否输出 RSS
+      if (rssEnabled || config.RSS_MODE) {
+        const rss = getRSS(listData);
+        if (typeof rss === "string") {
+          c.header("Content-Type", "application/xml; charset=utf-8");
+          return c.body(rss);
+        } else {
+          return c.json({ code: 500, message: "RSS generation failed" }, 500);
+        }
+      }
+      return c.json({ code: 200, ...listData });
+    });
+
+    // 请求方式错误
+    aggregateApp.all("*", (c) => c.json({ code: 405, message: "Method Not Allowed" }, 405));
+    continue;
+  }
+
   const listApp = app.basePath(`/${router}`);
   // 返回榜单
   listApp.get("/", async (c) => {
