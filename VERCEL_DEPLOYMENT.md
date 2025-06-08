@@ -45,7 +45,6 @@ vercel --prod
 - `GET /aggregate/{sources}` - 获取指定数据源的聚合数据
 
 ### 支持的数据源
-- `zhihu` - 知乎
 - `baidu` - 百度
 - `toutiao` - 今日头条
 - `douyin` - 抖音

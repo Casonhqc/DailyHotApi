@@ -2,47 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
 import { load } from 'cheerio';
 
-// 数据源配置
+// 数据源配置 - 移除知乎数据源，因为它返回模拟数据
 const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<any[]> }> = {
-  zhihu: {
-    displayName: "知乎",
-    fetcher: async () => {
-      try {
-        const response = await axios.get('https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=20&desktop=true', {
-          timeout: 8000,
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-          }
-        });
-
-        if (response.data && response.data.data && Array.isArray(response.data.data)) {
-          return response.data.data.slice(0, 10).map((item: any, index: number) => ({
-            id: item.target?.id || `zhihu_${index}`,
-            index,
-            title: item.target?.title || `知乎热点${index + 1}`,
-            desc: item.target?.excerpt || item.target?.title || `知乎热点内容${index + 1}`,
-            source: "知乎",
-            hot: Math.floor(parseFloat(item.detail_text?.split(" ")[0] || "0") * 10000) || Math.floor(Math.random() * 500000),
-            timestamp: Date.now()
-          }));
-        } else {
-          throw new Error('知乎API返回数据格式异常');
-        }
-      } catch (error) {
-        console.error('知乎数据获取失败，使用备用数据:', error);
-        // 返回备用模拟数据
-        return Array.from({length: 8}, (_, index) => ({
-          id: `zhihu_backup_${index}`,
-          index,
-          title: `知乎热门话题${index + 1}`,
-          desc: `知乎平台热门内容${index + 1}`,
-          source: "知乎",
-          hot: Math.floor(Math.random() * 800000) + 200000,
-          timestamp: Date.now()
-        }));
-      }
-    }
-  },
   baidu: {
     displayName: "百度",
     fetcher: async () => {
@@ -98,7 +59,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
           }
         });
-        return response.data.data.slice(0, 10).map((item: any, index: number) => ({
+        return response.data.data.slice(0, 20).map((item: any, index: number) => ({
           id: item.ClusterIdStr,
           index,
           title: item.Title,
@@ -143,7 +104,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         });
 
         if (response.data?.data?.word_list) {
-          return response.data.data.word_list.slice(0, 10).map((item: any, index: number) => ({
+          return response.data.data.word_list.slice(0, 15).map((item: any, index: number) => ({
             id: item.sentence_id,
             index,
             title: item.word,
@@ -182,7 +143,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         });
 
         if (response.data?.idlist?.[0]?.newslist) {
-          const list = response.data.idlist[0].newslist.slice(1, 11); // 跳过第一个，取10个
+          const list = response.data.idlist[0].newslist.slice(1, 16); // 跳过第一个，取15个
           return list.map((item: any, index: number) => ({
             id: item.id,
             index,
@@ -197,7 +158,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         throw new Error('腾讯新闻API返回数据格式异常');
       } catch (error) {
         console.error('腾讯新闻数据获取失败，使用备用数据:', error);
-        return Array.from({length: 8}, (_, index) => ({
+        return Array.from({length: 15}, (_, index) => ({
           id: `qq_news_backup_${index}`,
           index,
           title: `腾讯新闻热点${index + 1}`,
@@ -221,7 +182,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         });
 
         if (response.data?.data?.list) {
-          return response.data.data.list.slice(0, 10).map((item: any, index: number) => ({
+          return response.data.data.list.slice(0, 15).map((item: any, index: number) => ({
             id: item.docid,
             index,
             title: item.title,
@@ -235,7 +196,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         throw new Error('网易新闻API返回数据格式异常');
       } catch (error) {
         console.error('网易新闻数据获取失败，使用备用数据:', error);
-        return Array.from({length: 8}, (_, index) => ({
+        return Array.from({length: 15}, (_, index) => ({
           id: `netease_news_backup_${index}`,
           index,
           title: `网易新闻热点${index + 1}`,
@@ -268,7 +229,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         });
 
         if (response.data?.data?.hotList) {
-          return response.data.data.hotList.slice(0, 10).map((item: any, index: number) => ({
+          return response.data.data.hotList.slice(0, 15).map((item: any, index: number) => ({
             id: item.base?.base?.uniqueId || `sina_${index}`,
             index,
             title: item.info?.title || `新浪热点${index + 1}`,
@@ -282,7 +243,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         throw new Error('新浪API返回数据格式异常');
       } catch (error) {
         console.error('新浪数据获取失败，使用备用数据:', error);
-        return Array.from({length: 8}, (_, index) => ({
+        return Array.from({length: 15}, (_, index) => ({
           id: `sina_backup_${index}`,
           index,
           title: `新浪热点${index + 1}`,
@@ -314,7 +275,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         });
 
         if (response.data?.data?.hotRankList) {
-          return response.data.data.hotRankList.slice(0, 8).map((item: any, index: number) => ({
+          return response.data.data.hotRankList.slice(0, 15).map((item: any, index: number) => ({
             id: item.itemId,
             index,
             title: item.templateMaterial?.widgetTitle || `36氪科技资讯${index + 1}`,
@@ -328,7 +289,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         throw new Error('36氪API返回数据格式异常');
       } catch (error) {
         console.error('36氪数据获取失败，使用备用数据:', error);
-        return Array.from({length: 6}, (_, index) => ({
+        return Array.from({length: 15}, (_, index) => ({
           id: `36kr_backup_${index}`,
           index,
           title: `36氪科技资讯${index + 1}`,
@@ -364,7 +325,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
 
         const $ = load(response.data);
         const listDom = $(".rank-box .placeholder");
-        const listData = listDom.toArray().slice(0, 8).map((item, index) => {
+        const listData = listDom.toArray().slice(0, 15).map((item, index) => {
           const dom = $(item);
           const href = dom.find("a").attr("href");
           return {
@@ -381,7 +342,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         return listData;
       } catch (error) {
         console.error('IT之家数据获取失败，使用备用数据:', error);
-        return Array.from({length: 6}, (_, index) => ({
+        return Array.from({length: 15}, (_, index) => ({
           id: `ithome_backup_${index}`,
           index,
           title: `IT之家科技新闻${index + 1}`,
@@ -405,7 +366,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         });
 
         if (Array.isArray(response.data)) {
-          return response.data.slice(0, 8).map((item: any, index: number) => ({
+          return response.data.slice(0, 15).map((item: any, index: number) => ({
             id: item.id,
             index,
             title: item.title || `果壳科学内容${index + 1}`,
@@ -419,7 +380,7 @@ const sourceMap: Record<string, { displayName: string; fetcher: () => Promise<an
         throw new Error('果壳API返回数据格式异常');
       } catch (error) {
         console.error('果壳数据获取失败，使用备用数据:', error);
-        return Array.from({length: 5}, (_, index) => ({
+        return Array.from({length: 15}, (_, index) => ({
           id: `guokr_backup_${index}`,
           index,
           title: `果壳科学内容${index + 1}`,

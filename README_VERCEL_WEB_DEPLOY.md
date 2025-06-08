@@ -97,8 +97,7 @@ GET /aggregate/douyin?cache=false
 ```
 
 ### 支持的数据源
-- `zhihu` - 知乎
-- `baidu` - 百度  
+- `baidu` - 百度
 - `toutiao` - 今日头条
 - `douyin` - 抖音
 - `qq-news` - 腾讯新闻

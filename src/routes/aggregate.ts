@@ -2,9 +2,8 @@ import type { RouterData, ListContext, ListItem, AggregatedItem } from "../types
 import logger from "../utils/logger.js";
 
 // Map of source names to their route handlers and display names
-// 只包含指定的榜单内容
+// 只包含指定的榜单内容，移除知乎数据源（因为返回模拟数据）
 const sourceMap: Record<string, { handler: string; displayName: string }> = {
-  zhihu: { handler: "zhihu", displayName: "知乎" },
   baidu: { handler: "baidu", displayName: "百度" },
   toutiao: { handler: "toutiao", displayName: "今日头条" },
   douyin: { handler: "douyin", displayName: "抖音" },
